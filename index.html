@@ -101,23 +101,27 @@ async function loadUser() {
   document.getElementById("loggedInAs").textContent =
     "Logged in as " + profile.nickname;
 
-  const { data: prediction } = await db
-  .from("predictions")
-  .select("id")
-  .eq("user_id", session.user.id)
-  .maybeSingle();
+  const { data: statuses, error: statusError } = await db
+  .from("submission_status")
+  .select("player")
+  .eq("fixture_id", 1);
 
-if (prediction) {
+if (statusError) {
+  console.error(statusError);
+} else {
 
-  if (profile.nickname === "NUNGUS") {
+  const submittedPlayers = statuses.map(row => row.player);
+
+  if (submittedPlayers.includes("NUNGUS")) {
     document.getElementById("nungusStatus").textContent =
       "✓ Submitted";
   }
 
-  if (profile.nickname === "DUNGUS") {
+  if (submittedPlayers.includes("DUNGUS")) {
     document.getElementById("dungusStatus").textContent =
       "✓ Submitted";
   }
+}
 }
 }
 
