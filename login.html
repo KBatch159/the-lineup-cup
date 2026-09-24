@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - The Lineup Cup</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>THE LINEUP CUP</h1>
+
+<input
+  type="email"
+  id="email"
+  placeholder="Email"
+>
+
+<input
+  type="password"
+  id="password"
+  placeholder="Password"
+>
+
+<button onclick="login()">
+  LOGIN
+</button>
+
+<p id="message"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+  "https://ootxpnwkkhtrxouzbfmf.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_0vLcoFsUvwa1ZJKVWPw5BQ_8VOTKuMe";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function login() {
+
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  const { error } =
+    await db.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+  if (error) {
+
+    document.getElementById("message").textContent =
+      "Login failed: " + error.message;
+
+    return;
+  }
+
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
