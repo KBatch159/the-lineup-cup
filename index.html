@@ -65,29 +65,45 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
+  <script>
   const SUPABASE_URL = "https://ootxpnwkkhtrxouzbfnf.supabase.co";
   const SUPABASE_KEY = "sb_publishable_0vLcoFsUvwa1ZJKVWPw5BQ_8VOTKuMe";
 
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   async function loadFixture() {
-    const { data, error } = await db
-      .from("fixtures")
-      .select("*")
-      .order("fixture_date", { ascending: true })
-      .limit(1)
-      .single();
+    try {
+      const response = await fetch(
+        SUPABASE_URL + "/rest/v1/fixtures?select=*&order=fixture_date.asc&limit=1",
+        {
+          headers: {
+            "apikey": SUPABASE_KEY
+          }
+        }
+      );
 
-    if (error) {
+      if (!response.ok) {
+        throw new Error("Database error: " + response.status);
+      }
+
+      const data = await response.json();
+
+      if (!data.length) {
+        throw new Error("No fixture found");
+      }
+
+      const fixture = data[0];
+
+      document.getElementById("opponent").textContent =
+        "Exeter Chiefs v " + fixture.opponent;
+
+      document.getElementById("season").textContent =
+        fixture.competition + " · " + fixture.season;
+
+    } catch (error) {
       console.error(error);
-      return;
+
+      document.getElementById("opponent").textContent =
+        "Could not load fixture";
     }
-
-    document.getElementById("opponent").textContent =
-      "Exeter Chiefs v " + data.opponent;
-
-    document.getElementById("season").textContent = data.season;
   }
 
   loadFixture();
