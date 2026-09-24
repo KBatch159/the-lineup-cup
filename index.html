@@ -44,6 +44,8 @@
 
   <h1>THE LINEUP CUP</h1>
 
+<p id="loggedInAs" style="text-align:center;"></p>
+  
   <div class="fixture">
     <h2 id="opponent">Loading fixture...</h2>
     <p id="season"></p>
@@ -62,13 +64,46 @@
   <button onclick="window.location.href='prediction.html'">
     MAKE MY PREDICTION
   </button>
-
+  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
   const SUPABASE_URL = "https://ootxpnwkkhtrxouzbfmf.supabase.co";
   const SUPABASE_KEY = "sb_publishable_0vLcoFsUvwa1ZJKVWPw5BQ_8VOTKuMe";
 
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function loadUser() {
+
+  const {
+    data: { session }
+  } = await db.auth.getSession();
+
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const { data: profile, error } = await db
+    .from("profiles")
+    .select("nickname")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  document.getElementById("loggedInAs").textContent =
+    "Logged in as " + profile.nickname;
+}
+
+loadUser();
+    
   async function loadFixture() {
     try {
       const response = await fetch(
