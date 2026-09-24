@@ -52,7 +52,17 @@
 
 <button onclick="lockPrediction()">LOCK IN MY 23</button>
 
-<script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+
+const SUPABASE_URL = "https://ootxpnwkkhtrxouzbfmf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_0vLcoFsUvwa1ZJKVWPw5BQ_8VOTKuMe";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 const players = [
 "Nika Abuladze",
@@ -174,32 +184,97 @@ positions.forEach((position, index) => {
 });
 
 
-function lockPrediction() {
+async function lockPrediction() {
 
   const picks = [];
 
   for (let i = 1; i <= 23; i++) {
-    picks.push(document.getElementById("player" + i).value);
+    picks.push(
+      document.getElementById("player" + i).value
+    );
   }
 
+  // Check every position is filled
   if (picks.includes("")) {
     alert("You need to select all 23 players.");
     return;
   }
 
-  const uniquePlayers = new Set(picks);
-
-  if (uniquePlayers.size !== 23) {
+  // Check for duplicate players
+  if (new Set(picks).size !== 23) {
     alert("You've selected the same player more than once.");
     return;
   }
 
-  localStorage.setItem(
-    "lineupPrediction",
-    JSON.stringify(picks)
-  );
+  // Find logged-in user
+  const {
+    data: { session }
+  } = await db.auth.getSession();
 
-  alert("Your 23 has been locked in!");
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Find whether this is NUNGUS or DUNGUS
+  const { data: profile, error: profileError } =
+    await db
+      .from("profiles")
+      .select("nickname")
+      .eq("id", session.user.id)
+      .single();
+
+  if (profileError) {
+    alert("Could not identify player.");
+    return;
+  }
+
+  // Get current fixture
+  const { data: fixture, error: fixtureError } =
+    await db
+      .from("fixtures")
+      .select("id")
+      .order("fixture_date", { ascending: true })
+      .limit(1)
+      .single();
+
+  if (fixtureError) {
+    alert("Could not find the current fixture.");
+    return;
+  }
+
+  // Check whether you've already submitted
+  const { data: existing } =
+    await db
+      .from("predictions")
+      .select("id")
+      .eq("fixture_id", fixture.id)
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+  if (existing) {
+    alert("Your prediction is already locked in.");
+    return;
+  }
+
+  // Save prediction
+  const { error } =
+    await db
+      .from("predictions")
+      .insert({
+        fixture_id: fixture.id,
+        user_id: session.user.id,
+        player: profile.nickname,
+        lineup: picks
+      });
+
+  if (error) {
+    console.error(error);
+    alert("Something went wrong saving your prediction.");
+    return;
+  }
+
+  alert("Your 23 is locked in!");
 
   window.location.href = "index.html";
 }
