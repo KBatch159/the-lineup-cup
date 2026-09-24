@@ -37,6 +37,24 @@
       font-size: 17px;
       cursor: pointer;
     }
+
+  .action-box {
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 17px;
+  text-align: center;
+  border: 1px solid #888;
+  background: #eee;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.action-box.submitted {
+  cursor: default;
+  background: #f5f5f5;
+  color: #555;
+}
   </style>
 </head>
 
@@ -61,9 +79,11 @@
   <span id="dungusStatus">Not submitted</span>
 </div>
 
-  <button onclick="window.location.href='prediction.html'">
-    MAKE MY PREDICTION
-  </button>
+<div id="predictionAction"
+     class="action-box"
+     onclick="window.location.href='prediction.html'">
+  MAKE MY PREDICTION
+</div>
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -111,6 +131,18 @@ if (statusError) {
 } else {
 
   const submittedPlayers = statuses.map(row => row.player);
+
+  if (submittedPlayers.includes(profile.nickname)) {
+
+  const actionBox =
+    document.getElementById("predictionAction");
+
+  actionBox.textContent = "✓ LINEUP SUBMITTED";
+
+  actionBox.classList.add("submitted");
+
+  actionBox.onclick = null;
+}
 
   if (submittedPlayers.includes("NUNGUS")) {
     document.getElementById("nungusStatus").textContent =
