@@ -52,14 +52,14 @@
   </div>
 
   <div class="status">
-    <strong>NUNGUS</strong><br>
-    Not submitted
-  </div>
+  <strong>NUNGUS</strong><br>
+  <span id="nungusStatus">Not submitted</span>
+</div>
 
-  <div class="status">
-    <strong>DUNGUS</strong><br>
-    Not submitted
-  </div>
+<div class="status">
+  <strong>DUNGUS</strong><br>
+  <span id="dungusStatus">Not submitted</span>
+</div>
 
   <button onclick="window.location.href='prediction.html'">
     MAKE MY PREDICTION
@@ -100,6 +100,25 @@ async function loadUser() {
 
   document.getElementById("loggedInAs").textContent =
     "Logged in as " + profile.nickname;
+
+  const { data: prediction } = await db
+  .from("predictions")
+  .select("id")
+  .eq("user_id", session.user.id)
+  .maybeSingle();
+
+if (prediction) {
+
+  if (profile.nickname === "NUNGUS") {
+    document.getElementById("nungusStatus").textContent =
+      "✓ Submitted";
+  }
+
+  if (profile.nickname === "DUNGUS") {
+    document.getElementById("dungusStatus").textContent =
+      "✓ Submitted";
+  }
+}
 }
 
 loadUser();
