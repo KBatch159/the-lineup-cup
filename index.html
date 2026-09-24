@@ -45,8 +45,8 @@
   <h1>THE LINEUP CUP</h1>
 
   <div class="fixture">
-    <h2>Exeter Chiefs v Gloucester</h2>
-    <p>2026/27</p>
+    <h2 id="opponent">Loading fixture...</h2>
+    <p id="season"></p>
   </div>
 
   <div class="status">
@@ -63,5 +63,35 @@
     MAKE MY PREDICTION
   </button>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://ootxpnwkkhtrxouzbfnf.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_0vLcoFsUvwa1ZJKVWPw5BQ_8VOTKuMe";
+
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function loadFixture() {
+    const { data, error } = await db
+      .from("fixtures")
+      .select("*")
+      .order("fixture_date", { ascending: true })
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    document.getElementById("opponent").textContent =
+      "Exeter Chiefs v " + data.opponent;
+
+    document.getElementById("season").textContent = data.season;
+  }
+
+  loadFixture();
+</script>
+  
 </body>
 </html>
