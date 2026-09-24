@@ -81,9 +81,10 @@
       );
 
       if (!response.ok) {
-        throw new Error("Database error: " + response.status);
-      }
-
+  const errorText = await response.text();
+  throw new Error("Database error " + response.status + ": " + errorText);
+}
+      
       const data = await response.json();
 
       if (!data.length) {
@@ -102,7 +103,7 @@
       console.error(error);
 
       document.getElementById("opponent").textContent =
-        "Could not load fixture";
+  error.message;
     }
   }
 
