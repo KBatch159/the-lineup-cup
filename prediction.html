@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Prediction - The Lineup Cup</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .position {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>THE LINEUP CUP</h1>
+<h2>Make My Prediction</h2>
+
+<div id="lineup"></div>
+
+<button onclick="lockPrediction()">LOCK IN MY 23</button>
+
+<script>
+
+const players = [
+"Nika Abuladze",
+"Ethan Burger",
+"Will Goodrick-Clarke",
+"Archie McArthur",
+"Josh Mann",
+"Jack Yeandle",
+"Max Norey",
+"Joseph Dweba",
+"Louie Gulley",
+"Julian Heaven",
+"Josh Iosefa-Scott",
+"Ehren Painter",
+"Bachuki Tchumbadze",
+"Jimmy Roots",
+"Tom Gulley",
+"Isaac Godfrey",
+"Andrea Zambonin",
+"Dafydd Jenkins",
+"Harry Wilson",
+"Lewis Pearson",
+"Oscar Beckerleg",
+"Joe Bailey",
+"Obinna Nkwocha",
+"Marlon Farouk-Roy",
+"Luke Evans",
+"Greg Fisilau",
+"Tom Hooper",
+"Ethan Roots",
+"Ross Vintcent",
+"Kane James",
+"Finn Worley-Brady",
+"Richard Capstick",
+"Stephen Varney",
+"Sam Wolstenholme",
+"Tom Cairns",
+"Jake Murray",
+"George Newman",
+"Harvey Skinner",
+"Will Haydon-Wood",
+"Ben Coen",
+"Sam Harris",
+"Henry Slade",
+"Dallas McLeod",
+"Will Butt",
+"Zack Wimbush",
+"Ollie Batson",
+"Nic Allison",
+"Nick Lilley",
+"Immanuel Feyi-Waboso",
+"Campbell Ridl",
+"Paul Brown-Bampoe",
+"Charlie Poynton",
+"Noah Fenton",
+"Olly Woodburn",
+"Tommy Wyatt",
+"Ben Hammersley"
+];
+
+const positions = [
+"Loosehead Prop",
+"Hooker",
+"Tighthead Prop",
+"Lock",
+"Lock",
+"Flanker",
+"Flanker",
+"Number 8",
+"Scrum Half",
+"Fly Half",
+"Winger",
+"Inside Centre",
+"Outside Centre",
+"Winger",
+"Fullback",
+"Replacement",
+"Replacement",
+"Replacement",
+"Replacement",
+"Replacement",
+"Replacement",
+"Replacement",
+"Replacement"
+];
+
+const lineup = document.getElementById("lineup");
+
+positions.forEach((position, index) => {
+
+  const number = index + 1;
+
+  const container = document.createElement("div");
+  container.className = "position";
+
+  const label = document.createElement("label");
+  label.textContent = number + ". " + position;
+
+  const select = document.createElement("select");
+  select.id = "player" + number;
+
+  const blank = document.createElement("option");
+  blank.value = "";
+  blank.textContent = "Select player";
+  select.appendChild(blank);
+
+  players.forEach(player => {
+    const option = document.createElement("option");
+    option.value = player;
+    option.textContent = player;
+    select.appendChild(option);
+  });
+
+  container.appendChild(label);
+  container.appendChild(select);
+
+  lineup.appendChild(container);
+
+});
+
+
+function lockPrediction() {
+
+  const picks = [];
+
+  for (let i = 1; i <= 23; i++) {
+    picks.push(document.getElementById("player" + i).value);
+  }
+
+  if (picks.includes("")) {
+    alert("You need to select all 23 players.");
+    return;
+  }
+
+  const uniquePlayers = new Set(picks);
+
+  if (uniquePlayers.size !== 23) {
+    alert("You've selected the same player more than once.");
+    return;
+  }
+
+  localStorage.setItem(
+    "lineupPrediction",
+    JSON.stringify(picks)
+  );
+
+  alert("Your 23 has been locked in!");
+
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
